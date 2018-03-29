@@ -76,7 +76,7 @@ __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"] = __webpack_require__(2)(__
 let scene = new __WEBPACK_IMPORTED_MODULE_0_three__["Scene"]();
 
 let renderer = new __WEBPACK_IMPORTED_MODULE_0_three__["WebGLRenderer"]({ canvas: canvas1, anitalias: true });
-renderer.setClearColor(0xeefff999);
+renderer.setClearColor(0x777777);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight - 5);
 
@@ -98,45 +98,84 @@ light3.position.set(-50, -50, 50);
 scene.add(light3);
 
 // CONTAINERS OCH INNEHÅLL
-
-let rotatedContainer = new __WEBPACK_IMPORTED_MODULE_0_three__["Object3D"]();
+let rotBoxGeo = new __WEBPACK_IMPORTED_MODULE_0_three__["BoxGeometry"](20, 40, 20);
+let rotBoxMaterial = new __WEBPACK_IMPORTED_MODULE_0_three__["MeshBasicMaterial"]({ color: 0xffffff, wireframe: true, visible: false });
+let rotatedContainer = new __WEBPACK_IMPORTED_MODULE_0_three__["Mesh"](rotBoxGeo, rotBoxMaterial);
 
 rotatedContainer.position.set(0, 0, 0);
+rotatedContainer.alphaTest = -1;
 scene.add(rotatedContainer);
 
 // toggla rotationen
 
-// rotatedContainer.rotateX(0.5)
-// rotatedContainer.rotateY(0.5)
-// rotatedContainer.rotateZ(0.5)
+rotatedContainer.rotateX(0.5);
+rotatedContainer.rotateY(0.5);
+rotatedContainer.rotateZ(0.5);
 
 let geometry = new __WEBPACK_IMPORTED_MODULE_0_three__["BoxGeometry"](20, 5, 10);
 let material = new __WEBPACK_IMPORTED_MODULE_0_three__["MeshLambertMaterial"]({ color: 0x0000ff });
 let mesh = new __WEBPACK_IMPORTED_MODULE_0_three__["Mesh"](geometry, material);
+// mesh.position.set(0, 10, 0)
 
 let geometry2 = new __WEBPACK_IMPORTED_MODULE_0_three__["BoxGeometry"](10, 20, 5);
 let material2 = new __WEBPACK_IMPORTED_MODULE_0_three__["MeshLambertMaterial"]({ color: 0xff00ff });
 let mesh2 = new __WEBPACK_IMPORTED_MODULE_0_three__["Mesh"](geometry2, material2);
+mesh2.position.set(0, -10, 0);
 
-mesh2.position.set(0, -20, 0);
-rotatedContainer.add(mesh);
+let unrotatedContainer = new __WEBPACK_IMPORTED_MODULE_0_three__["Object3D"]();
+unrotatedContainer.position.set(0, 10, 0);
+
+unrotatedContainer.add(mesh);
+rotatedContainer.add(unrotatedContainer);
 rotatedContainer.add(mesh2);
+
+let floorGeo = new __WEBPACK_IMPORTED_MODULE_0_three__["BoxGeometry"](200, 3, 200);
+let floorMaterial = new __WEBPACK_IMPORTED_MODULE_0_three__["MeshLambertMaterial"]({ color: 0x283499 });
+let floorMesh = new __WEBPACK_IMPORTED_MODULE_0_three__["Mesh"](floorGeo, floorMaterial);
+floorMesh.position.set(0, -40, 0);
+scene.add(floorMesh);
+
+// HELPERS 
+
+let meshHelper = new __WEBPACK_IMPORTED_MODULE_0_three__["FaceNormalsHelper"](mesh, 6, 0xff0000, 1);
+let rotatedContainerHelper = new __WEBPACK_IMPORTED_MODULE_0_three__["FaceNormalsHelper"](rotatedContainer, 6, 0x00ff00, 1);
+// let box = new THREE.BoxHelper( rotatedContainer, 0x00ff00)
+// meshHelper.matrixAutoUpdate = true
+scene.add(meshHelper);
+scene.add(rotatedContainerHelper);
 
 // BERÄKNINGAR FÖR LOOKAT
 
-renderer.render(scene, camera);
 
-let perspectiveVec = mesh.parent.worldToLocal(camera.position.clone());
-mesh.lookAt(perspectiveVec);
+// let unrotatedWorldPos = unrotatedContainer.getWorldPosition()
+// let unrotatedLookAtTarget = unrotatedWorldPos
+// unrotatedLookAtTarget.y += 100
+// let unrotatedLookAtVec = unrotatedContainer.parent.worldToLocal( unrotatedLookAtTarget.clone() )
 
-renderer.render(scene, camera);
+// unrotatedLookAtVec.x = 1
+// unrotatedContainer.lookAt(unrotatedLookAtVec)
+let meshWorldPos;
+let meshUpVector;
 
-// console.log(compRotation);
-// console.log(mesh.quaternion);
+meshWorldPos = mesh.getWorldPosition();
+meshWorldPos.y += 1;
+meshUpVector = mesh.worldToLocal(meshWorldPos.clone());
 
+// scene.add(box)
+let val1 = 0.01;
+// let val2 = 0.01
+// let axis = new mesh.parent.worldToLocal( camera.position.clone() )
+let axis = new __WEBPACK_IMPORTED_MODULE_0_three__["Vector3"](0, 1, 1);
 function render() {
+
     let perspectiveVec = mesh.parent.worldToLocal(camera.position.clone());
+    perspectiveVec;
+    mesh.up = meshUpVector;
     mesh.lookAt(perspectiveVec);
+    // mesh.rotation.z = val1
+    // val1 += 0.01
+    meshHelper.update();
+    rotatedContainerHelper.update();
 
     renderer.render(scene, camera);
     requestAnimationFrame(render);
