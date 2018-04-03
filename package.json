@@ -4,6 +4,7 @@
   "description": "",
   "main": "gulpfile.js",
   "dependencies": {
+    "dat.gui": "^0.7.1",
     "three": "^0.90.0",
     "three-orbit-controls": "^82.1.0"
   },
