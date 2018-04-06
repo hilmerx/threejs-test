@@ -81,6 +81,8 @@ class Scene {
     constructor() {
 
         this.init();
+        this.color1 = [255, 255, 0];
+        this.color2 = [255, 0, 0];
     }
 
     init() {
@@ -91,21 +93,23 @@ class Scene {
     initPoints() {
         let starsGeometry = new __WEBPACK_IMPORTED_MODULE_0_three__["Geometry"]();
 
-        for (let i = 0; i < 10000; i++) {
+        for (let i = 0; i < 10; i++) {
 
-            let star = new __WEBPACK_IMPORTED_MODULE_0_three__["Vector3"]();
-            star.x = __WEBPACK_IMPORTED_MODULE_0_three__["Math"].randFloatSpread(200);
-            star.y = __WEBPACK_IMPORTED_MODULE_0_three__["Math"].randFloatSpread(200);
-            star.z = __WEBPACK_IMPORTED_MODULE_0_three__["Math"].randFloatSpread(200);
-
+            let star = this.createStar(60);
             starsGeometry.vertices.push(star);
         }
 
-        let starsMaterial = new __WEBPACK_IMPORTED_MODULE_0_three__["PointsMaterial"]({ color: 0x888888 });
+        let starsMaterial = new __WEBPACK_IMPORTED_MODULE_0_three__["PointsMaterial"]({
+            color: 0xffff00,
+            map: new __WEBPACK_IMPORTED_MODULE_0_three__["TextureLoader"]().load('assets/particle.png'),
+            size: 5,
+            transparent: true,
+            depthTest: false,
+            blending: __WEBPACK_IMPORTED_MODULE_0_three__["AdditiveBlending"]
+        });
 
-        let starField = new __WEBPACK_IMPORTED_MODULE_0_three__["Points"](starsGeometry, starsMaterial);
-
-        this.scene.add(starField);
+        this.starField = new __WEBPACK_IMPORTED_MODULE_0_three__["Points"](starsGeometry, starsMaterial);
+        this.scene.add(this.starField);
     }
 
     initSetup() {
@@ -115,13 +119,52 @@ class Scene {
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(window.innerWidth, window.innerHeight - 5);
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = __WEBPACK_IMPORTED_MODULE_0_three__["PCFSoftShadowMap"], this.camera = new __WEBPACK_IMPORTED_MODULE_0_three__["PerspectiveCamera"](35, window.innerWidth / (window.innerHeight - 5), 0.1, 3000);
-        this.camera.position.x = -270;
-        this.camera.position.y = 50;
-        this.camera.position.z = 35;
+        this.renderer.shadowMap.type = __WEBPACK_IMPORTED_MODULE_0_three__["PCFSoftShadowMap"];
+
+        this.camera = new __WEBPACK_IMPORTED_MODULE_0_three__["PerspectiveCamera"](35, window.innerWidth / (window.innerHeight - 5), 0.1, 3000);
+        this.camera.position.x = 0;
+        this.camera.position.y = 40;
+        this.camera.position.z = 200;
+
+        this.controls = new __WEBPACK_IMPORTED_MODULE_0_three__["OrbitControls"](this.camera);
+
+        this.gui = new __WEBPACK_IMPORTED_MODULE_1_dat_gui__["a" /* default */].GUI();
+        let guiEl = document.getElementsByClassName('dg main a');
+        guiEl[0].addEventListener('mousedown', event => {
+            event.stopPropagation();
+        });
+    }
+    updateStarField() {
+        let stars = this.starField.geometry.vertices;
+        let goal = 60;
+        for (let i = stars.length - 1; i >= 0; i--) {
+            let diff = goal - stars[i].y;
+            stars[i].y += diff / 10 * stars[i].speed;
+            stars[i].x += Math.sin(stars[i].y) * (diff / 50);
+            stars[i].z += Math.sin(stars[i].y) * (diff / 50);
+
+            if (stars[i].y > goal - 1) {
+                stars.splice(i, 1);
+                let newStar = this.createStar(6);
+                this.starField.geometry.vertices.push(newStar);
+            }
+        }
+        this.starField.geometry.verticesNeedUpdate = true;
     }
 
-    update(time) {}
+    createStar(y) {
+        let star = new __WEBPACK_IMPORTED_MODULE_0_three__["Vector3"]();
+        star.x = __WEBPACK_IMPORTED_MODULE_0_three__["Math"].randFloatSpread(20);
+        star.y = __WEBPACK_IMPORTED_MODULE_0_three__["Math"].randFloatSpread(y);
+        star.z = __WEBPACK_IMPORTED_MODULE_0_three__["Math"].randFloatSpread(20);
+        star.speed = (Math.random() * 2 + 1) / 3;
+
+        return star;
+    }
+
+    update(time) {
+        this.updateStarField();
+    }
 }
 
 let scene = new Scene();
@@ -48593,7 +48636,7 @@ var index = {
   GUI: GUI
 };
 
-/* unused harmony default export */ var _unused_webpack_default_export = (index);
+/* harmony default export */ __webpack_exports__["a"] = (index);
 //# sourceMappingURL=dat.gui.module.js.map
 
 
