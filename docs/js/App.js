@@ -118,10 +118,10 @@ class Scene {
 
     initSceneImports () {
         let texture = new THREE.TextureLoader()
-            .load('models/lowpoly_tex.png')
+            .load('assets/lowpoly_tex.png')
 
         let loader = new THREE.ObjectLoader()
-            .load('models/lowpolyscene.json', (obj) => {
+            .load('assets/lowpolyscene.json', (obj) => {
                 obj.traverse( child => {
                     child.material = new THREE.MeshLambertMaterial()
                     child.material.map = texture

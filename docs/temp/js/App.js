@@ -184,9 +184,9 @@ class Scene {
     }
 
     initSceneImports() {
-        let texture = new __WEBPACK_IMPORTED_MODULE_0_three__["TextureLoader"]().load('models/lowpoly_tex.png');
+        let texture = new __WEBPACK_IMPORTED_MODULE_0_three__["TextureLoader"]().load('assets/lowpoly_tex.png');
 
-        let loader = new __WEBPACK_IMPORTED_MODULE_0_three__["ObjectLoader"]().load('models/lowpolyscene.json', obj => {
+        let loader = new __WEBPACK_IMPORTED_MODULE_0_three__["ObjectLoader"]().load('assets/lowpolyscene.json', obj => {
             obj.traverse(child => {
                 child.material = new __WEBPACK_IMPORTED_MODULE_0_three__["MeshLambertMaterial"]();
                 child.material.map = texture;
